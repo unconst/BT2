@@ -23,6 +23,7 @@ Implementation of the config class, which manages the config of different bitten
 import yaml
 from munch import DefaultMunch
 from typing import Dict, Any, Optional
+from copy import deepcopy
 
 class Config ( DefaultMunch ):
     """
@@ -37,12 +38,26 @@ class Config ( DefaultMunch ):
             This default will be returned for attributes that are undefined.
     """
     def __init__(self, loaded_config = None, default: Optional[Any] = None ):
-        super().__init__(default, {})
+        super().__init__(default)
         if loaded_config:
             raise NotImplementedError('Function load_from_relative_path is not fully implemented.')
         
         self['__is_set'] = {}
 
+    def __deepcopy__(self, memo) -> 'Config':
+        _default = self.__default__
+        
+        config_state = self.__getstate__()
+        config_copy = Config()
+        memo[id(self)] = config_copy
+
+        config_copy.__setstate__(config_state)
+        config_copy.__default__ = _default
+    
+        config_copy['__is_set'] = deepcopy(self['__is_set'], memo)
+        
+        return config_copy
+        
     def __repr__(self) -> str:
         return self.__str__()
 

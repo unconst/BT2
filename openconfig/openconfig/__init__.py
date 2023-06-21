@@ -103,7 +103,7 @@ class config:
         cls.__split_params__(params=params, _config=_config)
 
         # Make the is_set map
-        _config.__is_set = {}
+        _config['__is_set'] = {}
 
         ## Reparse args using default of unset
         parser_no_defaults = deepcopy(parser)
@@ -113,7 +113,7 @@ class config:
 
         ## Diff the params and params_no_defaults to get the is_set map
         for arg_key, arg_val in params.__dict__.items():
-            _config.__is_set[arg_key] = arg_key not in params_no_defaults.__dict__
+            _config['__is_set'][arg_key] = arg_key not in params_no_defaults.__dict__
 
         return _config
     
