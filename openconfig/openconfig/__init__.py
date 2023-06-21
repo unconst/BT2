@@ -51,18 +51,15 @@ class config:
         """
         if parser == None:
             return config_impl.Config()
-        
-        # Config-specific parser.
-        config_parser = ArgumentParser()
 
         # Optionally add config specific arguments
         try:
-            config_parser.add_argument('--config', type=str, help='If set, defaults are overridden by passed file.')
+            parser.add_argument('--config', type=str, help='If set, defaults are overridden by passed file.')
         except:
             # this can fail if the --config has already been added.
             pass
         try:
-            config_parser.add_argument('--strict',  action='store_true', help='''If flagged, config will check that only exact arguemnts have been set.''', default=False )
+            parser.add_argument('--strict',  action='store_true', help='''If flagged, config will check that only exact arguemnts have been set.''', default=False )
         except:
             # this can fail if the --config has already been added.
             pass
@@ -73,12 +70,12 @@ class config:
 
         # 1.1 Optionally load defaults if the --config is set.
         try:
-            config_file_path = str(os.getcwd()) + '/' + vars(config_parser.parse_known_args(args)[0])['config']
+            config_file_path = str(os.getcwd()) + '/' + vars(parser.parse_known_args(args)[0])['config']
         except Exception as e:
             config_file_path = None
-
+        
         # Parse args not strict
-        config_params = cls.__parse_args__(args=args, parser=config_parser, strict=False)
+        config_params = cls.__parse_args__(args=args, parser=parser, strict=False)
 
         # 2. Optionally check for --strict, if stict we will parse the args strictly.
         strict = config_params.strict
