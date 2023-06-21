@@ -4,6 +4,3 @@ ansible_vault
 cryptography
 termcolor
 pathlib
-getpass
-json
-base64
