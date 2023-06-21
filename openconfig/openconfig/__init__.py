@@ -22,11 +22,10 @@ __version__ = "0.0.0"
 import os
 import sys
 from argparse import ArgumentParser, Namespace
-from typing import List, Optional, Dict
+from typing import List, Optional
 from copy import deepcopy
 
 import yaml
-import pandas as pd
 from . import config_impl
 
 class config:
