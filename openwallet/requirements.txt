@@ -1,5 +1,5 @@
 openconfig
-substrateinterface
+substrate-interface
 ansible_vault
 cryptography
 termcolor
