@@ -23,6 +23,7 @@ import os
 import sys
 from argparse import ArgumentParser, Namespace
 from typing import List, Optional, Dict
+from copy import deepcopy
 
 import yaml
 import pandas as pd
@@ -36,7 +37,7 @@ class config:
         """ In place of YAMLError
         """
 
-    def __new__( cls, parser: ArgumentParser = None, strict: bool = False, args: Optional[List[str]] = None ):
+    def __new__( cls, parser: ArgumentParser = None, strict: bool = False, args: Optional[List[str]] = None ) -> config_impl.Config:
         r""" Translates the passed parser into a nested Bittensor config.
         Args:
             parser (argparse.Parser):
@@ -51,15 +52,18 @@ class config:
         """
         if parser == None:
             return config_impl.Config()
+        
+        # Config-specific parser.
+        config_parser = ArgumentParser()
 
         # Optionally add config specific arguments
         try:
-            parser.add_argument('--config', type=str, help='If set, defaults are overridden by passed file.')
+            config_parser.add_argument('--config', type=str, help='If set, defaults are overridden by passed file.')
         except:
             # this can fail if the --config has already been added.
             pass
         try:
-            parser.add_argument('--strict',  action='store_true', help='''If flagged, config will check that only exact arguemnts have been set.''', default=False )
+            config_parser.add_argument('--strict',  action='store_true', help='''If flagged, config will check that only exact arguemnts have been set.''', default=False )
         except:
             # this can fail if the --config has already been added.
             pass
@@ -70,15 +74,15 @@ class config:
 
         # 1.1 Optionally load defaults if the --config is set.
         try:
-            config_file_path = str(os.getcwd()) + '/' + vars(parser.parse_known_args(args)[0])['config']
+            config_file_path = str(os.getcwd()) + '/' + vars(config_parser.parse_known_args(args)[0])['config']
         except Exception as e:
             config_file_path = None
 
         # Parse args not strict
-        params = cls.__parse_args__(args=args, parser=parser, strict=False)
+        config_params = cls.__parse_args__(args=args, parser=config_parser, strict=False)
 
         # 2. Optionally check for --strict, if stict we will parse the args strictly.
-        strict = params.strict
+        strict = config_params.strict
 
         if config_file_path != None:
             config_file_path = os.path.expanduser(config_file_path)
@@ -95,13 +99,33 @@ class config:
 
         _config = config_impl.Config()
 
-        # Splits params on dot syntax i.e neuron.axon_port
+        # Splits params and add to config
+        cls.__split_params__(params=params, _config=_config)
+
+        # Make the is_set map
+        _config.__is_set = {}
+
+        ## Reparse args using default of unset
+        parser_no_defaults = deepcopy(parser)
+        parser_no_defaults._defaults = {}
+
+        params_no_defaults = cls.__parse_args__(args=args, parser=parser_no_defaults, strict=strict)
+
+        ## Diff the params and params_no_defaults to get the is_set map
+        for arg_key, arg_val in params.__dict__.items():
+            _config.__is_set[arg_key] = arg_key not in params_no_defaults.__dict__
+
+        return _config
+    
+    @staticmethod
+    def __split_params__(params: Namespace, _config: config_impl.Config):
+        # Splits params on dot syntax i.e neuron.axon_port and adds to _config
         for arg_key, arg_val in params.__dict__.items():
             split_keys = arg_key.split('.')
             head = _config
             keys = split_keys
             while len(keys) > 1:
-                if hasattr(head, keys[0]):
+                if hasattr(head, keys[0]) and head[keys[0]] != None: # Needs to be Config
                     head = getattr(head, keys[0])
                     keys = keys[1:]
                 else:
@@ -110,49 +134,6 @@ class config:
                     keys = keys[1:]
             if len(keys) == 1:
                 head[keys[0]] = arg_val
-
-        # Get defaults for this config
-        #is_set_map = cls.__fill_is_set_list__(_config, bittensor.defaults)
-
-        #_config['__is_set'] = is_set_map
-
-        #_config.__fill_with_defaults__(is_set_map, bittensor.defaults)
-
-        return _config
-
-    @staticmethod
-    def __fill_is_set_list__(_config: 'Config', defaults: 'Config') -> Dict[str, bool]:
-        """Creates an is_set map
-        Args:
-            _config (bittensor.Config):
-                Config to generate is_set mapping.
-            defaults (bittensor.Config):
-                The bittensor defaults
-        Returns:
-            is_set_map (Dict[str, bool]):
-                A map from flattened param name to whether this param was set in a flag.
-        """
-        is_set_map = {}
-        config_d = _config.__dict__
-        # Only defaults we are concerned with
-        defaults_filtered = {}
-        for key in config_d.keys():
-            if key in defaults.keys():
-                defaults_filtered[key] = getattr(defaults, key)
-        # Avoid erroring out if defaults aren't set for a submodule
-        if defaults_filtered == {}:
-            return is_set_map
-
-        flat_config = pd.json_normalize(config_d, sep='.').to_dict('records')[0]
-        flat_defaults = pd.json_normalize(defaults_filtered, sep='.').to_dict('records')[0]
-        for key, _ in flat_defaults.items():
-            if key in flat_config:
-                is_set_map[key] = True
-            else:
-                is_set_map[key] = False
-        
-        return is_set_map
-
 
     @staticmethod
     def __parse_args__( args: List[str], parser: ArgumentParser = None, strict: bool = False) -> Namespace:

@@ -21,26 +21,35 @@ Implementation of the config class, which manages the config of different bitten
 # DEALINGS IN THE SOFTWARE.
 
 import yaml
-import pandas
-from munch import Munch
-from pandas import json_normalize
-from typing import Dict
+from munch import DefaultMunch
+from typing import Dict, Any, Optional
 
-class Config ( Munch ):
+class Config ( DefaultMunch ):
     """
+    Implementation of the config class, which manages the config of different bittensor modules.
     """
     __is_set: Dict[str, bool]
 
-    def __init__(self, loaded_config = None ):
-        super().__init__()
+    """
+    Args:
+        default (Optional[Any]):
+            Default value for the Config. Defaults to None.
+            This default will be returned for attributes that are undefined.
+    """
+    def __init__(self, loaded_config = None, default: Optional[Any] = None ):
+        super().__init__(default, {})
         if loaded_config:
             raise NotImplementedError('Function load_from_relative_path is not fully implemented.')
+        
+        self['__is_set'] = {}
 
     def __repr__(self) -> str:
         return self.__str__()
 
     def __str__(self) -> str:
-        return "\n" + yaml.dump(self.toDict())
+        config_dict = self.toDict()
+        config_dict.pop("__is_set")
+        return "\n" + yaml.dump(config_dict)
 
     def to_string(self, items) -> str:
         """ Get string from items
@@ -81,30 +90,3 @@ class Config ( Munch ):
             return False
         else:
             return self.get('__is_set')[param_name]
-
-    def __fill_with_defaults__(self, is_set_map: Dict[str, bool], defaults: 'Config') -> None:
-        """
-        Recursively fills the config with the default values using is_set_map
-        """
-        defaults_filtered = {}
-        for key in self.keys():
-            if key in defaults.keys():
-                defaults_filtered[key] = getattr(defaults, key)
-        # Avoid erroring out if defaults aren't set for a submodule
-        if defaults_filtered == {}: return
-
-        flat_defaults = json_normalize(defaults_filtered, sep='.').to_dict('records')[0]
-        for key, val in flat_defaults.items():
-            if key not in is_set_map:
-                continue
-            elif not is_set_map[key]:
-                # If the key is not set, set it to the default value
-                # Loop through flattened key to get leaf
-                a = self
-                keys = key.split('.')
-                for key_ in keys[:-1]:
-                    if key_ not in a:
-                        a[key_] = {}
-                    a = a[key_]
-                # Set leaf to default value
-                a[keys[-1]] = val
