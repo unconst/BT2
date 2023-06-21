@@ -1,8 +1,0 @@
-README.md
-setup.py
-openwallet/__init__.py
-openwallet.egg-info/PKG-INFO
-openwallet.egg-info/SOURCES.txt
-openwallet.egg-info/dependency_links.txt
-openwallet.egg-info/requires.txt
-openwallet.egg-info/top_level.txt

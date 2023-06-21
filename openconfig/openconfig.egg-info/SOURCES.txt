@@ -1,9 +1,0 @@
-README.md
-setup.py
-openconfig/__init__.py
-openconfig/config_impl.py
-openconfig.egg-info/PKG-INFO
-openconfig.egg-info/SOURCES.txt
-openconfig.egg-info/dependency_links.txt
-openconfig.egg-info/requires.txt
-openconfig.egg-info/top_level.txt
