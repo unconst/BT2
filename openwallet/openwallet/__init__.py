@@ -25,8 +25,8 @@ import os
 
 import openconfig
 from .wallet_impl import Wallet
-from .keyfile_impl import Keyfile
-from.keypair_impl import Keypair
+from .keyfile_impl import Keyfile, KeyFileError
+from .keypair_impl import Keypair
 
 class keyfile (object):
     """ Factory for a bittensor on device keypair
