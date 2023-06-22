@@ -36,7 +36,7 @@ from password_strength import PasswordPolicy
 from substrateinterface.utils.ss58 import ss58_encode
 from termcolor import colored
 
-from . import keypair_impl
+from .. import keypair_impl
 
 class KeyFileError(Exception):
     """ Error thrown when the keyfile is corrupt, non-writable, nno-readable or the password used to decrypt is invalid.
@@ -336,7 +336,7 @@ class Keyfile( object ):
                 password ( str, optional ):
                     Optional password used to decrypt file. If None, asks for user input.
             Returns:
-                keypair (bittensor.Keypair):
+                keypair (keypair_impl.Keypair):
                     Keypair stored under path.
             Raises:
                 KeyFileError:

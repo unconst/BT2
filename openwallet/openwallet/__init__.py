@@ -18,6 +18,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 __version__ = "0.0.0"
+__ss58_format__ = 42 # Bittensor ss58 format
 
 import argparse
 import copy
@@ -27,21 +28,10 @@ from typing import Optional
 import openconfig
 
 from .wallet_impl import Wallet as Wallet, WalletConfig as WalletConfig
-from .keyfile_impl import Keyfile as Keyfile, KeyFileError as KeyFileError
+from ._keyfile import Keyfile as Keyfile, KeyFileError as KeyFileError, keyfile as keyfile
 from .keypair_impl import Keypair as Keypair
+from . import utils as utils
 
-class keyfile (object):
-    """ Factory for a bittensor on device keypair
-    """
-    def __new__( cls, path: str = None ) -> 'keyfile_impl.Keyfile':
-        r""" Initialize a bittensor on device keypair interface.
-
-            Args:
-                path (required=False, default: ~/.bittensor/wallets/default/coldkey ):
-                    Path where this keypair is stored.
-        """
-        path = '~/.bittensor/wallets/default/coldkey' if path == None else path
-        return keyfile_impl.Keyfile( path = path )
 
 class wallet:
     """ Create and init wallet that stores hot and coldkey
@@ -58,8 +48,8 @@ class wallet:
         r""" Init bittensor wallet object containing a hot and coldkey.
 
             Args:
-                config (:obj:`bittensor.Config`, `optional`):
-                    bittensor.wallet.config()
+                config (:obj:`openconfig.Config`, `optional`):
+                    openwallet.wallet.config()
                 name (required=False, default='default'):
                     The name of the wallet to unlock for running bittensor
                 hotkey (required=False, default='default'):
@@ -85,7 +75,7 @@ class wallet:
     @classmethod
     def config(cls) -> 'openconfig.Config':
         """ Get config from the argument parser
-        Return: bittensor.config object
+        Return: openconfig.config object
         """
         parser = argparse.ArgumentParser()
         wallet.add_args( parser )
