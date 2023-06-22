@@ -20,14 +20,12 @@
 # DEALINGS IN THE SOFTWARE.
 
 import os
-import sys
-from types import SimpleNamespace
-from typing import Optional, Union, List, Tuple, Dict, overload
+from typing import Optional, Union, Tuple, Dict, overload, Any
+import openconfig
 
 import bittensor
 from bittensor.utils import is_valid_bittensor_address_or_public_key
 from substrateinterface import Keypair
-from substrateinterface.base import is_valid_ss58_address
 from termcolor import colored
 
 
@@ -43,6 +41,29 @@ def display_mnemonic_msg( keypair : Keypair, key_type : str ):
     print("btcli regen_{} --mnemonic {}".format(key_type, mnemonic))
     print('')
 
+class WalletConfig(openconfig.Config):
+    name: str
+    hotkey: str
+    path: str
+
+    defaults = {
+        "name": 'default',
+        "hotkey": 'default',
+        "path": '~/.bittensor/wallets/'
+    
+    }
+
+    def __init__(self, name: str = None, hotkey: str = None, path: str = None, **kwargs):
+        super().__init__(
+            loaded_config=None,
+            default = None
+        )
+        
+        self.name = name or self.defaults['name']
+        self.hotkey = hotkey or self.defaults['hotkey']
+        self.path = path or self.defaults['path']
+        self.update(kwargs)
+
 class Wallet():
     """
     Bittensor wallet maintenance class. Each wallet contains a coldkey and a hotkey.
@@ -56,7 +77,7 @@ class Wallet():
         name:str,
         path:str,
         hotkey:str,
-        config: 'bittensor.Config' = None,
+        config: Optional[WalletConfig] = None,
     ):
         r""" Init bittensor wallet object containing a hot and coldkey.
             Args:
@@ -66,7 +87,7 @@ class Wallet():
                     The name of hotkey used to running the miner.
                 path (required=True, default='~/.bittensor/wallets/'):
                     The path to your bittensor wallets
-                config (:obj:`bittensor.Config`, `optional`):
+                config (:obj:`WalletConfig`, `optional`):
                     bittensor.wallet.config()
         """
         self.name = name
