@@ -21,7 +21,7 @@ __version__ = "0.0.0"
 
 import os
 import sys
-from argparse import ArgumentParser, Namespace
+import argparse
 from typing import List, Optional
 from copy import deepcopy
 
@@ -36,10 +36,10 @@ class config:
         """ In place of YAMLError
         """
 
-    def __new__( cls, parser: ArgumentParser = None, strict: bool = False, args: Optional[List[str]] = None ) -> config_impl.Config:
+    def __new__( cls, parser: argparse.ArgumentParser = None, strict: bool = False, args: Optional[List[str]] = None ) -> config_impl.Config:
         r""" Translates the passed parser into a nested Bittensor config.
         Args:
-            parser (argparse.Parser):
+            parser (argparse.ArgumentParser):
                 Command line parser object.
             strict (bool):
                 If true, the command line arguments are strictly parsed.
@@ -103,18 +103,42 @@ class config:
 
         ## Reparse args using default of unset
         parser_no_defaults = deepcopy(parser)
-        parser_no_defaults._defaults = {}
-
+        ## Get all args by name
+        default_params = parser.parse_args(
+                args=[_config.get('command')] # Only command as the arg, else no args
+                    if _config.get('command') != None
+                    else []
+        )
+        all_default_args = default_params.__dict__.keys() | []
+        ## Make a dict with keys as args and values as argparse.SUPPRESS
+        defaults_as_suppress = {
+            key: argparse.SUPPRESS for key in all_default_args
+        }
+        ## Set the defaults to argparse.SUPPRESS, should remove them from the namespace
+        for action in parser_no_defaults._subparsers._actions:
+            # Should only be the "command" subparser action
+            if isinstance(action, argparse._SubParsersAction):
+                # Set the defaults to argparse.SUPPRESS, should remove them from the namespace
+                # Each choice is the keyword for a command, we need to set the defaults for each of these
+                ## Note: we also need to clear the _defaults dict for each, this is a quirk of argparse
+                cmd_parser: argparse.ArgumentParser
+                for cmd_parser in action.choices.values():
+                    cmd_parser.set_defaults(**defaults_as_suppress)
+                    cmd_parser._defaults.clear() # Needed for quirk of argparse
+                
+        ## Reparse the args, but this time with the defaults as argparse.SUPPRESS
         params_no_defaults = cls.__parse_args__(args=args, parser=parser_no_defaults, strict=strict)
 
         ## Diff the params and params_no_defaults to get the is_set map
-        for arg_key, arg_val in params.__dict__.items():
-            _config['__is_set'][arg_key] = arg_key not in params_no_defaults.__dict__
+        _config['__is_set'] = {
+            arg_key: True 
+                for arg_key in [k for k, _ in filter(lambda kv: kv[1] != argparse.SUPPRESS, params_no_defaults.__dict__.items())]
+        }
 
         return _config
     
     @staticmethod
-    def __split_params__(params: Namespace, _config: config_impl.Config):
+    def __split_params__(params: argparse.Namespace, _config: config_impl.Config):
         # Splits params on dot syntax i.e neuron.axon_port and adds to _config
         for arg_key, arg_val in params.__dict__.items():
             split_keys = arg_key.split('.')
@@ -132,7 +156,7 @@ class config:
                 head[keys[0]] = arg_val
 
     @staticmethod
-    def __parse_args__( args: List[str], parser: ArgumentParser = None, strict: bool = False) -> Namespace:
+    def __parse_args__( args: List[str], parser: argparse.ArgumentParser = None, strict: bool = False) -> argparse.Namespace:
         """Parses the passed args use the passed parser.
         Args:
             args (List[str]):
