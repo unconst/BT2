@@ -20,7 +20,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 import os
-from typing import Optional, Union, Tuple, Dict, overload, Any
+from typing import Optional, Union, Tuple, Dict, overload, Any, TypedDict
 import openconfig
 
 import bittensor
@@ -41,16 +41,21 @@ def display_mnemonic_msg( keypair : Keypair, key_type : str ):
     print("btcli regen_{} --mnemonic {}".format(key_type, mnemonic))
     print('')
 
-class WalletConfig(openconfig.Config):
+
+class WalletConfigDefault(TypedDict):
     name: str
     hotkey: str
     path: str
 
-    defaults = {
+class WalletConfig(openconfig.DefaultConfig):
+    name: str
+    hotkey: str
+    path: str
+
+    defaults: WalletConfigDefault = {
         "name": 'default',
         "hotkey": 'default',
         "path": '~/.bittensor/wallets/'
-    
     }
 
     def __init__(self, name: str = None, hotkey: str = None, path: str = None, **kwargs):
@@ -63,6 +68,13 @@ class WalletConfig(openconfig.Config):
         self.hotkey = hotkey or self.defaults['hotkey']
         self.path = path or self.defaults['path']
         self.update(kwargs)
+
+    @classmethod
+    def default(cls) -> 'WalletConfig':
+        wallet_config = cls()
+        wallet_config.update_with_kwargs(cls.defaults)
+
+        return wallet_config
 
 class Wallet():
     """
