@@ -36,11 +36,13 @@ from password_strength import PasswordPolicy
 from substrateinterface.utils.ss58 import ss58_encode
 from termcolor import colored
 
+from . import keypair_impl
+
 class KeyFileError(Exception):
     """ Error thrown when the keyfile is corrupt, non-writable, nno-readable or the password used to decrypt is invalid.
     """
 
-def serialized_keypair_to_keyfile_data( keypair: 'Keypair' ):
+def serialized_keypair_to_keyfile_data( keypair: 'keypair_impl.Keypair' ):
     """ Serializes keypair object into keyfile data.
         Args:
             password ( str, required ):
@@ -63,7 +65,7 @@ def serialized_keypair_to_keyfile_data( keypair: 'Keypair' ):
     data = json.dumps( json_data ).encode()
     return data
 
-def deserialize_keypair_from_keyfile_data( keyfile_data:bytes ) -> 'Keypair':
+def deserialize_keypair_from_keyfile_data( keyfile_data:bytes ) -> 'keypair_impl.Keypair':
     """ Deserializes Keypair object from passed keyfile data.
         Args:
             keyfile_data ( bytest, required ):
@@ -94,13 +96,13 @@ def deserialize_keypair_from_keyfile_data( keyfile_data:bytes ) -> 'Keypair':
             raise KeyFileError('Keypair could not be created from keyfile data: {}'.format( string_value ))
 
     if "secretSeed" in keyfile_dict and keyfile_dict['secretSeed'] != None:
-        return Keypair.create_from_seed(keyfile_dict['secretSeed'])
+        return keypair_impl.Keypair.create_from_seed(keyfile_dict['secretSeed'])
 
     if "secretPhrase" in keyfile_dict and keyfile_dict['secretPhrase'] != None:
-        return Keypair.create_from_mnemonic(mnemonic=keyfile_dict['secretPhrase'])
+        return keypair_impl.Keypair.create_from_mnemonic(mnemonic=keyfile_dict['secretPhrase'])
 
     if "ss58Address" in keyfile_dict and keyfile_dict['ss58Address'] != None:
-        return Keypair( ss58_address = keyfile_dict['ss58Address'] )
+        return keypair_impl.Keypair( ss58_address = keyfile_dict['ss58Address'] )
 
     else:
         raise KeyFileError('Keypair could not be created from keyfile data: {}'.format( keyfile_dict ))
@@ -268,7 +270,7 @@ class Keyfile( object ):
         return self.__str__()
 
     @property
-    def keypair( self ) -> 'Keypair':
+    def keypair( self ) -> 'keypair_impl.Keypair':
         """ Returns the keypair from path, decrypts data if the file is encrypted.
             Args:
                 password ( str, optional ):
@@ -307,7 +309,7 @@ class Keyfile( object ):
         """
         return self._read_keyfile_data_from_file()
 
-    def set_keypair ( self, keypair: 'Keypair', encrypt: bool = True, overwrite: bool = False, password:str = None):
+    def set_keypair ( self, keypair: 'keypair_impl.Keypair', encrypt: bool = True, overwrite: bool = False, password:str = None):
         """ Writes the keypair to the file and optional encrypts data.
             Args:
                 keypair (Keypair):
@@ -328,7 +330,7 @@ class Keyfile( object ):
             keyfile_data = encrypt_keyfile_data( keyfile_data, password )
         self._write_keyfile_data_to_file( keyfile_data, overwrite = overwrite )
 
-    def get_keypair(self, password: str = None) -> 'Keypair':
+    def get_keypair(self, password: str = None) -> 'keypair_impl.Keypair':
         """ Returns the keypair from path, decrypts data if the file is encrypted.
             Args:
                 password ( str, optional ):
