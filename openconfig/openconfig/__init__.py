@@ -115,16 +115,21 @@ class config:
             key: argparse.SUPPRESS for key in all_default_args
         }
         ## Set the defaults to argparse.SUPPRESS, should remove them from the namespace
-        for action in parser_no_defaults._subparsers._actions:
-            # Should only be the "command" subparser action
-            if isinstance(action, argparse._SubParsersAction):
-                # Set the defaults to argparse.SUPPRESS, should remove them from the namespace
-                # Each choice is the keyword for a command, we need to set the defaults for each of these
-                ## Note: we also need to clear the _defaults dict for each, this is a quirk of argparse
-                cmd_parser: argparse.ArgumentParser
-                for cmd_parser in action.choices.values():
-                    cmd_parser.set_defaults(**defaults_as_suppress)
-                    cmd_parser._defaults.clear() # Needed for quirk of argparse
+        parser_no_defaults.set_defaults(**defaults_as_suppress)
+        parser_no_defaults._defaults.clear() # Needed for quirk of argparse
+
+        ### Check for subparsers and do the same
+        if parser_no_defaults._subparsers != None:
+            for action in parser_no_defaults._subparsers._actions:
+                # Should only be the "command" subparser action
+                if isinstance(action, argparse._SubParsersAction):
+                    # Set the defaults to argparse.SUPPRESS, should remove them from the namespace
+                    # Each choice is the keyword for a command, we need to set the defaults for each of these
+                    ## Note: we also need to clear the _defaults dict for each, this is a quirk of argparse
+                    cmd_parser: argparse.ArgumentParser
+                    for cmd_parser in action.choices.values():
+                        cmd_parser.set_defaults(**defaults_as_suppress)
+                        cmd_parser._defaults.clear() # Needed for quirk of argparse
                 
         ## Reparse the args, but this time with the defaults as argparse.SUPPRESS
         params_no_defaults = cls.__parse_args__(args=args, parser=parser_no_defaults, strict=strict)
