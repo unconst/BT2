@@ -22,7 +22,7 @@ Implementation of the config class, which manages the config of different bitten
 
 import yaml
 from munch import DefaultMunch
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, TypeVar, Type
 from copy import deepcopy
 
 class Config ( DefaultMunch ):
@@ -105,3 +105,18 @@ class Config ( DefaultMunch ):
             return False
         else:
             return self.get('__is_set')[param_name]
+
+
+T = TypeVar('T', bound='DefaultConfig')
+
+class DefaultConfig( Config ):
+    """
+    A Config with a set of default values.
+    """
+    
+    @classmethod
+    def default(cls: Type[T]) -> T:
+        """
+        Get default config.
+        """
+        raise NotImplementedError('Function default is not implemented.')
