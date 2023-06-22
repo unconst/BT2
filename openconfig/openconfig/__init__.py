@@ -26,7 +26,7 @@ from typing import List, Optional
 from copy import deepcopy
 
 import yaml
-from .config_impl import Config as Config
+from .config_impl import Config as Config, DefaultConfig as DefaultConfig
 
 
 class InvalidConfigFile(Exception):
