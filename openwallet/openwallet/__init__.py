@@ -28,7 +28,7 @@ from typing import Optional
 import openconfig
 
 from .wallet_impl import Wallet as Wallet, WalletConfig as WalletConfig
-from ._keyfile import Keyfile as Keyfile, KeyFileError as KeyFileError, keyfile as keyfile
+from ._keyfile import Keyfile as Keyfile, KeyFileError as KeyFileError, keyfile as keyfile, serialized_keypair_to_keyfile_data as serialized_keypair_to_keyfile_data
 from .keypair_impl import Keypair as Keypair
 from . import utils as utils
 
