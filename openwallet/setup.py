@@ -39,7 +39,8 @@ def get_version(rel_path):
         raise RuntimeError("Unable to find version string.")
 
 
-requirements = read_requirements("requirements.txt")
+requirements = read_requirements("requirements/prod.txt")
+test_requirements = read_requirements("requirements/test.txt")
 
 setup(
     name="openwallet",
@@ -54,6 +55,9 @@ setup(
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
     install_requires=requirements,
+    extras_require={
+        "test": test_requirements
+    },
     classifiers=[
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Build Tools",
