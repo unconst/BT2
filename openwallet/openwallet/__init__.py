@@ -46,7 +46,7 @@ class keyfile (object):
 class wallet:
     """ Create and init wallet that stores hot and coldkey
     """    
-    defaults = WalletConfig.defaults
+    defaults: WalletConfig = WalletConfig.default()
 
     def __new__(
             cls,
@@ -115,14 +115,15 @@ class wallet:
 
 
     @classmethod
-    def add_defaults(cls, defaults: openconfig.Config) -> None:
+    def add_defaults(cls, defaults: openconfig.Config, prefix: str = 'wallet' ) -> None:
         """ Adds parser defaults to object, optionally using enviroment variables.
         """
-        defaults = cls.defaults
-        defaults.name = os.getenv('BT_WALLET_NAME') if os.getenv('BT_WALLET_NAME') != None else cls.defaults.name
-        defaults.hotkey = os.getenv('BT_WALLET_HOTKEY') if os.getenv('BT_WALLET_HOTKEY') != None else cls.defaults.hotkey
-        defaults.path = os.getenv('BT_WALLET_PATH') if os.getenv('BT_WALLET_PATH') != None else cls.defaults.path
-        
+        default_config = WalletConfig()
+        default_config.name = os.getenv('BT_WALLET_NAME') if os.getenv('BT_WALLET_NAME') != None else cls.defaults.name
+        default_config.hotkey = os.getenv('BT_WALLET_HOTKEY') if os.getenv('BT_WALLET_HOTKEY') != None else cls.defaults.hotkey
+        default_config.path = os.getenv('BT_WALLET_PATH') if os.getenv('BT_WALLET_PATH') != None else cls.defaults.path
+
+        setattr( defaults, prefix, default_config )
 
     @classmethod
     def check_config(cls, config: 'openconfig.Config' ):
