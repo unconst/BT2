@@ -23,10 +23,12 @@ import os
 from typing import Optional, Union, Tuple, Dict, overload, Any, TypedDict
 import openconfig
 
-import bittensor
-from bittensor.utils import is_valid_bittensor_address_or_public_key
 from substrateinterface import Keypair
 from termcolor import colored
+
+from . import __ss58_format__
+from .utils import is_valid_bittensor_address_or_public_key, get_ss58_format
+from ._keyfile import Keyfile, keyfile
 
 
 def display_mnemonic_msg( keypair : Keypair, key_type : str ):
@@ -100,7 +102,7 @@ class Wallet():
                 path (required=True, default='~/.bittensor/wallets/'):
                     The path to your bittensor wallets
                 config (:obj:`WalletConfig`, `optional`):
-                    bittensor.wallet.config()
+                    Wallet configuration object.
         """
         self.name = name
         self.path = path
@@ -140,47 +142,47 @@ class Wallet():
         return self
 
     @property
-    def hotkey_file(self) -> 'bittensor.Keyfile':
+    def hotkey_file(self) -> 'Keyfile':
 
         wallet_path = os.path.expanduser(os.path.join(self.path, self.name))
         hotkey_path = os.path.join(wallet_path, "hotkeys", self.hotkey_str)
-        return bittensor.keyfile( path = hotkey_path )
+        return keyfile( path = hotkey_path )
 
     @property
-    def coldkey_file(self) -> 'bittensor.Keyfile':
+    def coldkey_file(self) -> 'Keyfile':
         wallet_path = os.path.expanduser(os.path.join(self.path, self.name))
         coldkey_path = os.path.join(wallet_path, "coldkey")
-        return bittensor.keyfile( path = coldkey_path )
+        return keyfile( path = coldkey_path )
 
     @property
-    def coldkeypub_file(self) -> 'bittensor.Keyfile':
+    def coldkeypub_file(self) -> 'Keyfile':
         wallet_path = os.path.expanduser(os.path.join(self.path, self.name))
         coldkeypub_path = os.path.join(wallet_path, "coldkeypub.txt")
-        return bittensor.Keyfile( path = coldkeypub_path )
+        return Keyfile( path = coldkeypub_path )
 
-    def set_hotkey(self, keypair: 'bittensor.Keypair', encrypt: bool = False, overwrite: bool = False) -> 'bittensor.Keyfile':
+    def set_hotkey(self, keypair: 'Keypair', encrypt: bool = False, overwrite: bool = False) -> 'Keyfile':
         self._hotkey = keypair
         self.hotkey_file.set_keypair( keypair, encrypt = encrypt, overwrite = overwrite )
 
-    def set_coldkeypub(self, keypair: 'bittensor.Keypair', encrypt: bool = False, overwrite: bool = False) -> 'bittensor.Keyfile':
+    def set_coldkeypub(self, keypair: 'Keypair', encrypt: bool = False, overwrite: bool = False) -> 'Keyfile':
         self._coldkeypub = Keypair(ss58_address=keypair.ss58_address)
         self.coldkeypub_file.set_keypair( self._coldkeypub, encrypt = encrypt, overwrite = overwrite  )
 
-    def set_coldkey(self, keypair: 'bittensor.Keypair', encrypt: bool = True, overwrite: bool = False) -> 'bittensor.Keyfile':
+    def set_coldkey(self, keypair: 'Keypair', encrypt: bool = True, overwrite: bool = False) -> 'Keyfile':
         self._coldkey = keypair
         self.coldkey_file.set_keypair( self._coldkey, encrypt = encrypt, overwrite = overwrite )
 
-    def get_coldkey(self, password: str = None ) -> 'bittensor.Keypair':
+    def get_coldkey(self, password: str = None ) -> 'Keypair':
         self.coldkey_file.get_keypair( password = password )
 
-    def get_hotkey(self, password: str = None ) -> 'bittensor.Keypair':
+    def get_hotkey(self, password: str = None ) -> 'Keypair':
         self.hotkey_file.get_keypair( password = password )
 
-    def get_coldkeypub(self, password: str = None ) -> 'bittensor.Keypair':
+    def get_coldkeypub(self, password: str = None ) -> 'Keypair':
         self.coldkeypub_file.get_keypair( password = password )
 
     @property
-    def hotkey(self) -> 'bittensor.Keypair':
+    def hotkey(self) -> 'Keypair':
         r""" Loads the hotkey from wallet.path/wallet.name/hotkeys/wallet.hotkey or raises an error.
             Returns:
                 hotkey (Keypair):
@@ -194,7 +196,7 @@ class Wallet():
         return self._hotkey
 
     @property
-    def coldkey(self) -> 'bittensor.Keypair':
+    def coldkey(self) -> 'Keypair':
         r""" Loads the hotkey from wallet.path/wallet.name/coldkey or raises an error.
             Returns:
                 coldkey (Keypair):
@@ -208,7 +210,7 @@ class Wallet():
         return self._coldkey
 
     @property
-    def coldkeypub(self) -> 'bittensor.Keypair':
+    def coldkeypub(self) -> 'Keypair':
         r""" Loads the coldkeypub from wallet.path/wallet.name/coldkeypub.txt or raises an error.
             Returns:
                 coldkeypub (Keypair):
@@ -349,10 +351,10 @@ class Wallet():
             raise ValueError(f"Invalid {'ss58_address' if ss58_address is not None else 'public_key'}")
 
         if ss58_address is not None:
-            ss58_format = bittensor.utils.get_ss58_format( ss58_address )
+            ss58_format = get_ss58_format( ss58_address )
             keypair = Keypair(ss58_address=ss58_address, public_key=public_key, ss58_format=ss58_format)
         else:
-            keypair = Keypair(ss58_address=ss58_address, public_key=public_key, ss58_format=bittensor.__ss58_format__)
+            keypair = Keypair(ss58_address=ss58_address, public_key=public_key, ss58_format=__ss58_format__)
 
         # No need to encrypt the public key
         self.set_coldkeypub( keypair, overwrite = overwrite)
@@ -428,17 +430,17 @@ class Wallet():
             if isinstance( mnemonic, str): mnemonic = mnemonic.split()
             if len(mnemonic) not in [12,15,18,21,24]:
                 raise ValueError("Mnemonic has invalid size. This should be 12,15,18,21 or 24 words")
-            keypair = Keypair.create_from_mnemonic(" ".join(mnemonic), ss58_format=bittensor.__ss58_format__ )
+            keypair = Keypair.create_from_mnemonic(" ".join(mnemonic), ss58_format=__ss58_format__ )
             display_mnemonic_msg( keypair, "coldkey" )
         elif seed is not None:
-            keypair = Keypair.create_from_seed(seed, ss58_format=bittensor.__ss58_format__ )
+            keypair = Keypair.create_from_seed(seed, ss58_format=__ss58_format__ )
         else:
             # json is not None
             if not isinstance(json, tuple) or len(json) != 2 or not isinstance(json[0], (str, dict)) or not isinstance(json[1], str):
                 raise ValueError("json must be a tuple of (json_data: str | Dict, passphrase: str)")
 
             json_data, passphrase = json
-            keypair = Keypair.create_from_encrypted_json( json_data, passphrase, ss58_format=bittensor.__ss58_format__ )
+            keypair = Keypair.create_from_encrypted_json( json_data, passphrase, ss58_format=__ss58_format__ )
 
         self.set_coldkey( keypair, encrypt = use_password, overwrite = overwrite)
         self.set_coldkeypub( keypair, overwrite = overwrite)
@@ -510,17 +512,17 @@ class Wallet():
             if isinstance( mnemonic, str): mnemonic = mnemonic.split()
             if len(mnemonic) not in [12,15,18,21,24]:
                 raise ValueError("Mnemonic has invalid size. This should be 12,15,18,21 or 24 words")
-            keypair = Keypair.create_from_mnemonic(" ".join(mnemonic), ss58_format=bittensor.__ss58_format__ )
+            keypair = Keypair.create_from_mnemonic(" ".join(mnemonic), ss58_format=__ss58_format__ )
             display_mnemonic_msg( keypair, "hotkey" )
         elif seed is not None:
-            keypair = Keypair.create_from_seed(seed, ss58_format=bittensor.__ss58_format__ )
+            keypair = Keypair.create_from_seed(seed, ss58_format=__ss58_format__ )
         else:
             # json is not None
             if not isinstance(json, tuple) or len(json) != 2 or not isinstance(json[0], (str, dict)) or not isinstance(json[1], str):
                 raise ValueError("json must be a tuple of (json_data: str | Dict, passphrase: str)")
 
             json_data, passphrase = json
-            keypair = Keypair.create_from_encrypted_json( json_data, passphrase, ss58_format=bittensor.__ss58_format__ )
+            keypair = Keypair.create_from_encrypted_json( json_data, passphrase, ss58_format=__ss58_format__ )
 
 
         self.set_hotkey( keypair, encrypt=use_password, overwrite = overwrite)
