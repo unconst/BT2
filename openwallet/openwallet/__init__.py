@@ -24,14 +24,14 @@ import copy
 from distutils.util import strtobool
 import os
 
-from openconfig import config
+import openconfig
 from bittensor.utils import strtobool
 from . import wallet_impl, keyfile_impl, keypair_impl
 
 class keyfile (object):
     """ Factory for a bittensor on device keypair
     """
-    def __new__( cls, path: str = None ) -> 'Keyfile':
+    def __new__( cls, path: str = None ) -> 'keyfile_impl.Keyfile':
         r""" Initialize a bittensor on device keypair interface.
 
             Args:
@@ -52,7 +52,7 @@ class wallet:
             hotkey: str = None,
             path: str = None,
             _mock: bool = None
-        ) -> 'bittensor.Wallet':
+        ) -> 'wallet_impl.Wallet':
         r""" Init bittensor wallet object containing a hot and coldkey.
 
             Args:
@@ -75,18 +75,6 @@ class wallet:
         config.wallet.path = path if path != None else config.wallet.path
         config.wallet._mock = _mock if _mock != None else config.wallet._mock
         wallet.check_config( config )
-        # Allows mocking from the command line.
-        if config.wallet.get('name', bittensor.defaults.wallet.name) == 'mock' or config.wallet._mock:
-            config.wallet._mock = True
-            _mock = True
-
-            return wallet_mock.Wallet_mock(
-                name = config.wallet.get('name', bittensor.defaults.wallet.name),
-                hotkey = config.wallet.get('hotkey', bittensor.defaults.wallet.hotkey),
-                path = config.wallet.path,
-                _mock = True,
-                config = config
-            )
 
         network = config.get('subtensor.network', bittensor.defaults.subtensor.network)
 
@@ -99,13 +87,13 @@ class wallet:
         )
 
     @classmethod
-    def config(cls) -> 'bittensor.Config':
+    def config(cls) -> 'openconfig.Config':
         """ Get config from the argument parser
         Return: bittensor.config object
         """
         parser = argparse.ArgumentParser()
         wallet.add_args( parser )
-        return bittensor.config( parser )
+        return openconfig.config( parser )
 
     @classmethod
     def help(cls):
@@ -123,7 +111,7 @@ class wallet:
         prefix_str = '' if prefix == None else prefix + '.'
         if prefix is not None:
             if not hasattr(bittensor.defaults, prefix):
-                setattr(bittensor.defaults, prefix, bittensor.Config())
+                setattr(bittensor.defaults, prefix, openconfig.Config())
             getattr(bittensor.defaults, prefix).wallet = bittensor.defaults.wallet
         try:
             parser.add_argument('--' + prefix_str + 'wallet.name', required=False, default=argparse.SUPPRESS, help='''The name of the wallet to unlock for running bittensor (name mock is reserved for mocking this wallet)''')
@@ -140,7 +128,7 @@ class wallet:
     def add_defaults(cls, defaults):
         """ Adds parser defaults to object from enviroment variables.
         """
-        defaults.wallet = bittensor.Config()
+        defaults.wallet = openconfig.Config()
         defaults.wallet.name = os.getenv('BT_WALLET_NAME') if os.getenv('BT_WALLET_NAME') != None else 'default'
         defaults.wallet.hotkey = os.getenv('BT_WALLET_HOTKEY') if os.getenv('BT_WALLET_HOTKEY') != None else 'default'
         defaults.wallet.path = os.getenv('BT_WALLET_PATH') if os.getenv('BT_WALLET_PATH') != None else '~/.bittensor/wallets/'
@@ -149,7 +137,7 @@ class wallet:
         defaults.wallet.reregister = True
 
     @classmethod
-    def check_config(cls, config: 'bittensor.Config' ):
+    def check_config(cls, config: 'openconfig.Config' ):
         """ Check config for wallet name/hotkey/path/hotkeys/sort_by
         """
         assert 'wallet' in config
