@@ -26,15 +26,18 @@ from typing import List, Optional
 from copy import deepcopy
 
 import yaml
-from . import config_impl
+from .config_impl import Config as Config
+
+
+class InvalidConfigFile(Exception):
+    """ In place of YAMLError
+    """
+    pass
 
 class config:
     """
     Create and init the config class, which manages the config of different bittensor modules.
     """
-    class InvalidConfigFile(Exception):
-        """ In place of YAMLError
-        """
 
     def __new__( cls, parser: argparse.ArgumentParser = None, strict: bool = False, args: Optional[List[str]] = None ) -> config_impl.Config:
         r""" Translates the passed parser into a nested Bittensor config.
@@ -46,7 +49,7 @@ class config:
             args (list of str):
                 Command line arguments.
         Returns:
-            config (bittensor.Config):
+            config (config_impl.Config):
                 Nested config object created from parser arguments.
         """
         if parser == None:
