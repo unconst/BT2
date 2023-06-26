@@ -40,12 +40,13 @@ def get_version(rel_path):
 
 
 requirements = read_requirements("requirements/prod.txt")
+test_requirements = read_requirements("requirements/test.txt")
 
 setup(
     name="open-config",
     version=get_version("openconfig/__init__.py"),
     description="OpenConfig is a library for managing the configuration of the Bittensor Python API.",
-    url="https://github.com/opentensor/openconfig",
+    url="https://github.com/opentensor/open-config",
     author="bittensor.com",
     packages=["openconfig"],
     include_package_data=True,
@@ -54,6 +55,9 @@ setup(
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
     install_requires=requirements,
+    extras_require={
+        "test": test_requirements
+    },
     classifiers=[
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Build Tools",
