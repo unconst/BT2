@@ -24,10 +24,10 @@ import time
 import unittest
 from unittest.mock import patch
 
-from openwallet.keypair_impl import Keypair
-from openwallet.wallet_impl import Wallet
-from openwallet._keyfile import Keyfile, keyfile
-from openwallet._keyfile.keyfile_impl import validate_password, ask_password_to_encrypt, decrypt_keyfile_data, KeyFileError
+from btwallet.keypair_impl import Keypair
+from btwallet.wallet_impl import Wallet
+from btwallet._keyfile import Keyfile, keyfile
+from btwallet._keyfile.keyfile_impl import validate_password, ask_password_to_encrypt, decrypt_keyfile_data, KeyFileError
 
 class TestWallet(unittest.TestCase):
 

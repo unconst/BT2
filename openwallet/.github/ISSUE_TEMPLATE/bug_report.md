@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Environment:**
  - OS and Distro: [e.g. Linux Ubuntu, Linux Fedora, etc.]
- - OpenWallet Version [e.g. 0.0.1]
+ - BTWallet Version [e.g. 0.0.1]
 
 **Additional context**
 Add any other context about the problem here.

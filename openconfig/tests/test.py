@@ -22,7 +22,7 @@ import unittest
 
 import argparse
 
-from openconfig import Config, config
+from btconfig import Config, config
 
 class TestConfig(unittest.TestCase):
 

@@ -43,12 +43,12 @@ requirements = read_requirements("requirements/prod.txt")
 test_requirements = read_requirements("requirements/test.txt")
 
 setup(
-    name="open-wallet",
-    version=get_version("openwallet/__init__.py"),
-    description="OpenWallet is a library for managing wallet keypairs, keyfiles, etc. for the Bittensor API.",
-    url="https://github.com/opentensor/open-wallet",
+    name="bt-wallet",
+    version=get_version("btwallet/__init__.py"),
+    description="BTWallet is a library for managing wallet keypairs, keyfiles, etc. for the Bittensor API.",
+    url="https://github.com/opentensor/bt-wallet",
     author="bittensor.com",
-    packages=["openwallet"],
+    packages=["btwallet"],
     include_package_data=True,
     author_email="",
     license="MIT",
