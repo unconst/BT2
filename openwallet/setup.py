@@ -44,11 +44,11 @@ test_requirements = read_requirements("requirements/test.txt")
 
 setup(
     name="openwallet",
-    version=get_version("openwallet/__init__.py"),
-    description="Openvalidators is a collection of open source validators for the Bittensor Network.",
+    version=get_version("open-wallet/__init__.py"),
+    description="OpenWallet is a library for managing wallet keypairs, keyfiles, etc. for the Bittensor API.",
     url="https://github.com/opentensor/validators",
     author="bittensor.com",
-    packages=["openwallet"],
+    packages=["open-wallet"],
     include_package_data=True,
     author_email="",
     license="MIT",
