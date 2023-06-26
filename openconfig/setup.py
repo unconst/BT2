@@ -43,11 +43,11 @@ requirements = read_requirements("requirements/prod.txt")
 
 setup(
     name="open-config",
-    version=get_version("open-config/__init__.py"),
+    version=get_version("openconfig/__init__.py"),
     description="OpenConfig is a library for managing the configuration of the Bittensor Python API.",
     url="https://github.com/opentensor/openconfig",
     author="bittensor.com",
-    packages=["open-config"],
+    packages=["openconfig"],
     include_package_data=True,
     author_email="",
     license="MIT",
