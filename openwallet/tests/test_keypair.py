@@ -18,7 +18,7 @@
 import unittest
 
 from scalecodec import ScaleBytes
-from btwallet.keypair_impl import Keypair, KeypairType
+from openwallet.keypair_impl import Keypair, KeypairType
 from substrateinterface.constants import DEV_PHRASE
 from substrateinterface.exceptions import ConfigurationError
 from bip39 import bip39_validate

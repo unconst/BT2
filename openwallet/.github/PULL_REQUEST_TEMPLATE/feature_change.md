@@ -11,9 +11,9 @@
 
 Link to the issue that your change relates to. 
 
-To contribute an enhancement that isn't covered by one of the items above, please follow our guide for suggesting an enhancement: https://github.com/opentensor/bt-wallet/blob/main/CONTRIBUTING.md#suggesting-enhancements
+To contribute an enhancement that isn't covered by one of the items above, please follow our guide for suggesting an enhancement: https://github.com/opentensor/open-wallet/blob/main/CONTRIBUTING.md#suggesting-enhancements
 
-To contribute other changes, you must use a different template. You can see all templates at https://github.com/opentensor/bt-wallet/tree/main/.github/PULL_REQUEST_TEMPLATE.
+To contribute other changes, you must use a different template. You can see all templates at https://github.com/opentensor/open-wallet/tree/main/.github/PULL_REQUEST_TEMPLATE.
 
 -->
 

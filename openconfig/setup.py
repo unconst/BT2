@@ -43,12 +43,12 @@ requirements = read_requirements("requirements/prod.txt")
 test_requirements = read_requirements("requirements/test.txt")
 
 setup(
-    name="bt-config",
-    version=get_version("btconfig/__init__.py"),
-    description="BTConfig is a library for managing the configuration of the Bittensor Python API.",
-    url="https://github.com/opentensor/bt-config",
+    name="open-config",
+    version=get_version("openconfig/__init__.py"),
+    description="OpenConfig is a library for managing the configuration of the Bittensor Python API.",
+    url="https://github.com/opentensor/open-config",
     author="bittensor.com",
-    packages=["btconfig"],
+    packages=["openconfig"],
     include_package_data=True,
     author_email="",
     license="MIT",
