@@ -80,8 +80,9 @@ class config:
         # Parse args not strict
         config_params = cls.__parse_args__(args=args, parser=parser, strict=False)
 
-        # 2. Optionally check for --strict, if stict we will parse the args strictly.
-        strict = config_params.strict
+        # 2. Optionally check for --strict
+        ## strict=True when passed in OR when --strict is set
+        strict = config_params.strict or strict
 
         if config_file_path != None:
             config_file_path = os.path.expanduser(config_file_path)
