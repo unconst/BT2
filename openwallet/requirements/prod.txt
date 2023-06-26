@@ -1,4 +1,4 @@
-openconfig
+open-config
 substrate-interface
 ansible_vault
 cryptography

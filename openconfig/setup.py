@@ -42,12 +42,12 @@ def get_version(rel_path):
 requirements = read_requirements("requirements/prod.txt")
 
 setup(
-    name="openconfig",
-    version=get_version("openconfig/__init__.py"),
-    description="Openvalidators is a collection of open source validators for the Bittensor Network.",
+    name="open-config",
+    version=get_version("open-config/__init__.py"),
+    description="OpenConfig is a library for managing the configuration of the Bittensor Python API.",
     url="https://github.com/opentensor/openconfig",
     author="bittensor.com",
-    packages=["openconfig"],
+    packages=["open-config"],
     include_package_data=True,
     author_email="",
     license="MIT",
