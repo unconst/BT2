@@ -39,7 +39,7 @@ def get_version(rel_path):
         raise RuntimeError("Unable to find version string.")
 
 
-requirements = read_requirements("requirements.txt")
+requirements = read_requirements("requirements/prod.txt")
 
 setup(
     name="openconfig",
