@@ -22,7 +22,7 @@ import unittest
 
 import argparse
 
-from openconfig import Config, config
+from bittensor_config import Config, config
 
 class TestConfig(unittest.TestCase):
 

@@ -21,7 +21,7 @@
 
 import os
 from typing import Optional, Union, Tuple, Dict, overload, Any, TypedDict
-import openconfig
+import bittensor_config
 
 from substrateinterface import Keypair
 from termcolor import colored
@@ -49,7 +49,7 @@ class WalletConfigDefault(TypedDict):
     hotkey: str
     path: str
 
-class WalletConfig(openconfig.DefaultConfig):
+class WalletConfig(bittensor_config.DefaultConfig):
     name: str
     hotkey: str
     path: str

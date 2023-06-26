@@ -1,16 +1,16 @@
-# OpenConfig - v0.0.0
+# BittensorConfig - v0.0.0
 
-OpenConfig is a library for managing the configuration of the [Bittensor Python API](https://github.com/opentensor/bittensor).
+BittensorConfig is a library for managing the configuration of the [Bittensor Python API](https://github.com/opentensor/bittensor).
 
 # Installation
-This package can be installed from [PyPi.org](https://pypi.org/project/open-config/):
+This package can be installed from [PyPi.org](https://pypi.org/project/bittensor-config/):
 ```bash
-pip install open-config==0.0.0
+pip install bittensor-config==0.0.0
 ```
 or via this repo (using [gh-cli](https://cli.github.com/)):  
 ```bash
-gh repo clone opentensor/open-config
-cd open-config
+gh repo clone opentensor/bittensor-config
+cd bittensor-config
 pip install -e .
 ```
 

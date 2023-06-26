@@ -25,7 +25,7 @@ import copy
 import os
 from typing import Optional
 
-import openconfig
+import bittensor_config
 
 from .wallet_impl import Wallet as Wallet, WalletConfig as WalletConfig
 from ._keyfile import Keyfile as Keyfile, KeyFileError as KeyFileError, keyfile as keyfile, serialized_keypair_to_keyfile_data as serialized_keypair_to_keyfile_data
@@ -48,8 +48,8 @@ class wallet:
         r""" Init bittensor wallet object containing a hot and coldkey.
 
             Args:
-                config (:obj:`openconfig.Config`, `optional`):
-                    openwallet.wallet.config()
+                config (:obj:`bittensor_config.Config`, `optional`):
+                    bittensor_wallet.wallet.config()
                 name (required=False, default='default'):
                     The name of the wallet to unlock for running bittensor
                 hotkey (required=False, default='default'):
@@ -73,13 +73,13 @@ class wallet:
         )
 
     @classmethod
-    def config(cls) -> 'openconfig.Config':
+    def config(cls) -> 'bittensor_config.Config':
         """ Get config from the argument parser
-        Return: openconfig.config object
+        Return: bittensor_config.config object
         """
         parser = argparse.ArgumentParser()
         wallet.add_args( parser )
-        return openconfig.config( parser )
+        return bittensor_config.config( parser )
 
     @classmethod
     def help(cls):
@@ -105,7 +105,7 @@ class wallet:
 
 
     @classmethod
-    def add_defaults(cls, defaults: openconfig.Config, prefix: str = 'wallet' ) -> None:
+    def add_defaults(cls, defaults: bittensor_config.Config, prefix: str = 'wallet' ) -> None:
         """ Adds parser defaults to object, optionally using enviroment variables.
         """
         default_config = WalletConfig()
@@ -116,7 +116,7 @@ class wallet:
         setattr( defaults, prefix, default_config )
 
     @classmethod
-    def check_config(cls, config: 'openconfig.Config' ):
+    def check_config(cls, config: 'bittensor_config.Config' ):
         """ Check config for wallet name/hotkey/path/hotkeys/sort_by
         """
         assert 'wallet' in config
