@@ -1,6 +1,6 @@
-open-config
-substrate-interface
-ansible_vault
-cryptography
-termcolor
-pathlib
+ansible-vault==2.1.0
+cryptography==41.0.1
+open-config==0.0.0
+pathlib==1.0.1
+substrate-interface==1.7.3
+termcolor==2.3.0
