@@ -48,7 +48,7 @@ setup(
     description="OpenWallet is a library for managing wallet keypairs, keyfiles, etc. for the Bittensor API.",
     url="https://github.com/opentensor/validators",
     author="bittensor.com",
-    packages=["open-wallet"],
+    packages=["openwallet"],
     include_package_data=True,
     author_email="",
     license="MIT",
